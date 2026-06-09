@@ -10,6 +10,10 @@ chip, protocol-compatible with **HLK-LD6002**) over UART (CP2104 bridge).
 The dashboard shows: **heart rate [BPM]**, breathing [/min], distance [cm], presence,
 and the heart/breathing phase waveforms.
 
+<img src="docs/_static/adte2104_front.png" alt="Andar ADTE2104 / HLK-LD6002 module" width="220">
+
+*The sensor — Andar `ADTM6101PJDM41P04` (HLK-LD6002), 25 × 23 mm. Image © [Shenzhen Hi-Link](https://www.hlktech.net/index.php?id=1180).*
+
 ![ADTE2104 dashboard — heart rate, breathing, distance, presence](docs/_static/dashboard.png)
 
 ## Documentation

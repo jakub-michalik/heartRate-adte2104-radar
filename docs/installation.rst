@@ -11,6 +11,28 @@ Requirements
 - A USB-UART bridge supporting **1 382 400 baud** (e.g. **Silicon Labs CP2104**,
   CP2102N, FTDI FT232H). Cheaper/slower adapters may fail to set this baud rate.
 
+The module
+----------
+
+.. list-table::
+   :widths: 33 33 33
+
+   * - .. figure:: _static/adte2104_front.png
+          :width: 100%
+
+          Front — 2T2R patch antennas (Andar)
+     - .. figure:: _static/adte2104_back.png
+          :width: 100%
+
+          Back — ADT6101P chip + flash
+     - .. figure:: _static/adte2104_pinout.png
+          :width: 100%
+
+          Dimensions & pinout (25 × 23 mm)
+
+Board marking: ``ADTM6101PJDM41P04`` (Andar). Images: © Shenzhen Hi-Link
+Electronic — `product page <https://www.hlktech.net/index.php?id=1180>`_.
+
 Hardware and wiring
 -------------------
 
