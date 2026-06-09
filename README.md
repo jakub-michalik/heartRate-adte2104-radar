@@ -1,5 +1,9 @@
 # ADTE2104 v2.0 — radar tętna i obecności (60 GHz)
 
+[![Dokumentacja](https://github.com/jakub-michalik/heartRate-adte2104-radar/actions/workflows/docs.yml/badge.svg)](https://github.com/jakub-michalik/heartRate-adte2104-radar/actions/workflows/docs.yml)
+[![Docs online](https://img.shields.io/badge/docs-online-brightgreen)](https://jakub-michalik.github.io/heartRate-adte2104-radar/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 Odczyt i wizualizacja na żywo z radaru **Andar ADTE2104 v2.0** (chip **ADT6101P**,
 protokołowo zgodny z **HLK-LD6002**) podłączonego przez UART (mostek CP2104).
 
@@ -87,3 +91,7 @@ Moduł 3.3 V: `TX → RX` mostka, `RX → TX`, `GND → GND`.
 - HLK-LD6002 (chip ADT6101P): <https://www.hlktech.net/index.php?id=1180>
 - icewind1991/hlk_ld6002 (Rust): <https://github.com/icewind1991/hlk_ld6002>
 - phuongnamzz/HLK-LD6002 (Arduino): <https://github.com/phuongnamzz/HLK-LD6002>
+
+## Licencja
+
+[MIT](LICENSE) © 2026 Jakub Michalik
