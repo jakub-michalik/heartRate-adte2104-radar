@@ -3,7 +3,8 @@
 Andar ADTE2104 v2.0 / HLK-LD6002 (chip ADT6101P) — 60 GHz radar vital-signs.
 Live dashboard: tetno (BPM), oddech, dystans, obecnosc + przebiegi fazy.
 
-Protokol (zweryfikowany na zywo + biblioteka icewind1991/hlk_ld6002):
+Protokol (zweryfikowany na zywo + biblioteka icewind1991/hlk_ld6002)::
+
   UART 1382400 8N1 (CP2104 wymaga ustawienia przez pyserial, nie stty).
   Ramka TLV:  01 | ID(2 BE) | LEN(2 BE) | TYPE(2 BE) | HCK(1) | DATA[LEN] | DCK(1)
     HCK = ~XOR(bajty 0..6) & 0xFF ;  DCK = ~XOR(DATA) & 0xFF
@@ -16,7 +17,7 @@ Protokol (zweryfikowany na zywo + biblioteka icewind1991/hlk_ld6002):
 import sys, time, struct, threading, collections
 import serial
 
-PORT = sys.argv[1] if len(sys.argv) > 1 else "/dev/ttyUSB1"
+PORT = "/dev/ttyUSB1"   # domyslny; mozna nadpisac argumentem CLI
 BAUD = 1382400
 
 PHASE, RESP, HEART, DIST = 0x0A13, 0x0A14, 0x0A15, 0x0A16
@@ -132,29 +133,22 @@ def print_banner(rd):
     print("=" * 60)
 
 
-def main():
-    try:
-        rd = Reader(PORT, BAUD)
-    except serial.SerialException as e:
-        print(f"Blad otwarcia {PORT} @ {BAUD}: {e}")
-        return
-    rd.start()
-    print_banner(rd)
-
-    import matplotlib
+def build_dashboard(rd):
+    """Buduje figure dashboardu i zwraca (fig, update) — wspolne dla trybu live i zrzutu."""
     import matplotlib.pyplot as plt
-    from matplotlib.animation import FuncAnimation
-    import numpy as np
 
     fig = plt.figure(figsize=(11, 7))
-    fig.canvas.manager.set_window_title("ADTE2104 — Vital Signs")
+    try:
+        fig.canvas.manager.set_window_title("ADTE2104 — Vital Signs")
+    except Exception:
+        pass  # brak managera (backend Agg / zrzut)
     gs = fig.add_gridspec(3, 3, height_ratios=[1, 1.3, 1.3], hspace=0.45, wspace=0.3)
 
     ax_txt = fig.add_subplot(gs[0, :]); ax_txt.axis("off")
-    t_hr  = ax_txt.text(0.02, 0.5, "", fontsize=42, fontweight="bold", color="#d6336c", va="center")
-    t_br  = ax_txt.text(0.40, 0.7, "", fontsize=20, va="center")
-    t_di  = ax_txt.text(0.40, 0.25, "", fontsize=20, va="center")
-    t_pr  = ax_txt.text(0.72, 0.5, "", fontsize=24, fontweight="bold", va="center")
+    t_hr = ax_txt.text(0.02, 0.5, "", fontsize=42, fontweight="bold", color="#d6336c", va="center")
+    t_br = ax_txt.text(0.40, 0.7, "", fontsize=20, va="center")
+    t_di = ax_txt.text(0.40, 0.25, "", fontsize=20, va="center")
+    t_pr = ax_txt.text(0.72, 0.5, "", fontsize=24, fontweight="bold", va="center")
 
     ax_hp = fig.add_subplot(gs[1, :]); ax_hp.set_title("Faza sercowa (przebieg)")
     ax_hp.set_ylabel("faza"); l_hp, = ax_hp.plot([], [], color="#d6336c", lw=1.4)
@@ -177,11 +171,55 @@ def main():
             l_bp.set_data(range(len(bp)), bp); ax_bp.relim(); ax_bp.autoscale_view()
         return l_hp, l_bp
 
+    return fig, update
+
+
+def run_live(rd):
+    import matplotlib.pyplot as plt
+    from matplotlib.animation import FuncAnimation
+    fig, update = build_dashboard(rd)
     ani = FuncAnimation(fig, update, interval=100, cache_frame_data=False)
     try:
         plt.show()
     finally:
         rd.running = False
+
+
+def run_shot(rd, path, secs=8.0):
+    """Headless zrzut dashboardu do PNG po zebraniu 'secs' sekund danych."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    print(f"Zbieram dane {secs:.0f} s do zrzutu…")
+    time.sleep(secs)
+    fig, update = build_dashboard(rd)
+    update(0)
+    fig.savefig(path, dpi=110, bbox_inches="tight")
+    rd.running = False
+    print(f"Zapisano zrzut: {path}")
+
+
+def main():
+    args = sys.argv[1:]
+    shot = None
+    if "--shot" in args:
+        idx = args.index("--shot")
+        shot = args[idx + 1] if idx + 1 < len(args) else "dashboard.png"
+        del args[idx:idx + 2]
+    global PORT
+    if args:
+        PORT = args[0]
+    try:
+        rd = Reader(PORT, BAUD)
+    except serial.SerialException as e:
+        print(f"Blad otwarcia {PORT} @ {BAUD}: {e}")
+        return
+    rd.start()
+    print_banner(rd)
+    if shot:
+        run_shot(rd, shot)
+    else:
+        run_live(rd)
 
 
 if __name__ == "__main__":

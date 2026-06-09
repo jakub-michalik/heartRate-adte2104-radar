@@ -6,6 +6,19 @@ protokołowo zgodny z **HLK-LD6002**) podłączonego przez UART (mostek CP2104).
 Dashboard pokazuje: **tętno [BPM]**, oddech [/min], dystans [cm], obecność oraz
 przebiegi fazy sercowej i oddechowej.
 
+![Dashboard ADTE2104 — tętno, oddech, dystans, obecność](docs/_static/dashboard.png)
+
+## Dokumentacja
+
+Pełna dokumentacja (Sphinx) w katalogu [`docs/`](docs/) — opis protokołu, instalacja,
+uruchomienie, API i źródła. Budowanie lokalnie:
+
+```bash
+.venv/bin/pip install -r docs/requirements.txt
+.venv/bin/sphinx-build -b html docs docs/_build/html
+# otwórz docs/_build/html/index.html
+```
+
 ## Protokół (zweryfikowany na żywo)
 
 - **UART 1382400 baud, 8N1, bez parzystości.**
