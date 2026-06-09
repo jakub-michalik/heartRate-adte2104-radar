@@ -1,40 +1,42 @@
-Źródła i materiały
-==================
+References
+==========
 
-Dokumentacja producenta (Hi-Link / Andar)
------------------------------------------
+Vendor documentation (Hi-Link / Andar)
+---------------------------------------
 
-- `HLK-LD6002 — 60 GHz radar oddechu i tętna (Shenzhen Hi-Link)
-  <https://www.hlktech.net/index.php?id=1180>`_ — strona produktu modułu
-  zgodnego z ADTE2104; chip **ADT6101P**, UART domyślnie **1 382 400 baud**,
-  bez parzystości.
-- `HLK-LD6002 — instrukcja (manuals.plus)
+- `HLK-LD6002 — 60 GHz breathing & heart-rate radar (Shenzhen Hi-Link)
+  <https://www.hlktech.net/index.php?id=1180>`_ — product page of the module
+  compatible with the ADTE2104; **ADT6101P** chip, UART default **1 382 400 baud**,
+  no parity.
+- `HLK-LD6002 — manual (manuals.plus)
   <https://manuals.plus/m/53b7125a37e085cd52122b49edfad57af10432b14394d39b45b61d427c80497b>`_
-  — opis modułu i interfejsu UART.
-- `Karta produktu LD6002 / LD6002B / LD6002C (manuals.plus)
-  <https://manuals.plus/ae/1005005458549623>`_ — wariant testboardu i piny.
+  — module and UART interface description.
+- `LD6002 / LD6002B / LD6002C datasheet (manuals.plus)
+  <https://manuals.plus/ae/1005005458549623>`_ — testboard variant and pinout.
 
-Implementacje protokołu (open source)
--------------------------------------
+Protocol implementations (open source)
+--------------------------------------
 
-- `icewind1991/hlk_ld6002 <https://github.com/icewind1991/hlk_ld6002>`_ — biblioteka
-  Rust; źródło definicji typów ramek (``Phase 0x0A13``, ``Respiratory 0x0A14``,
-  ``Heartbeat 0x0A15``, ``Distance 0x0A16``) i sposobu dekodowania float32.
-- `phuongnamzz/HLK-LD6002 <https://github.com/phuongnamzz/HLK-LD6002>`_ — biblioteka
-  Arduino dla tego samego modułu.
+- `icewind1991/hlk_ld6002 <https://github.com/icewind1991/hlk_ld6002>`_ — Rust
+  library; source of the frame-type definitions (``Phase 0x0A13``,
+  ``Respiratory 0x0A14``, ``Heartbeat 0x0A15``, ``Distance 0x0A16``) and the
+  float32 decoding.
+- `phuongnamzz/HLK-LD6002 <https://github.com/phuongnamzz/HLK-LD6002>`_ — Arduino
+  library for the same module.
 
-Materiały dodatkowe
--------------------
+Further reading
+---------------
 
 - `Estimation of Human Body Vital Signs Based on 60 GHz Doppler Radar (PMC)
-  <https://pmc.ncbi.nlm.nih.gov/articles/PMC6068558/>`_ — tło teoretyczne pomiaru
-  vital-signs radarem 60 GHz.
-- `Seeed Studio MR60BHA2 — moduł 60 GHz oparty na Andar
+  <https://pmc.ncbi.nlm.nih.gov/articles/PMC6068558/>`_ — theoretical background
+  for radar-based 60 GHz vital-signs measurement.
+- `Seeed Studio MR60BHA2 — 60 GHz module based on Andar
   <https://wiki.seeedstudio.com/getting_started_with_mr60bha2_mmwave_kit/>`_ —
-  pokrewny moduł tej samej rodziny (inny, wyższy protokół TLV z SOF ``0x01``).
+  a related module of the same family (a different, higher-level TLV protocol
+  with SOF ``0x01``).
 
 .. note::
 
-   Nazwa **ADTE2104** nie występuje w publicznej dokumentacji producenta;
-   identyfikację (ADT6101P / rodzina LD6002) ustalono na podstawie zgodności
-   protokołu UART potwierdzonej empirycznie oraz względem powyższych bibliotek.
+   The name **ADTE2104** does not appear in the vendor's public documentation;
+   the identification (ADT6101P / LD6002 family) was established from the UART
+   protocol compatibility confirmed empirically and against the libraries above.

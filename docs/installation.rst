@@ -1,24 +1,23 @@
-Instalacja
-==========
+Installation
+============
 
-Wymagania
----------
+Requirements
+------------
 
-- **Linux** z dostępem do portu szeregowego (użytkownik w grupie ``dialout``,
-  bez ``sudo``).
+- **Linux** with serial-port access (user in the ``dialout`` group, no ``sudo``).
 - **Python 3.10+**.
-- Środowisko graficzne dla trybu live (matplotlib otwiera okno GUI).
-  Tryb zrzutu ekranu (``--shot``) działa headless.
-- Mostek USB-UART obsługujący **1 382 400 baud** (np. **Silicon Labs CP2104**,
-  CP2102N, FTDI FT232H). Tańsze/wolniejsze adaptery mogą nie ustawić tego baudu.
+- A graphical environment for live mode (matplotlib opens a GUI window).
+  The screenshot mode (``--shot``) runs headless.
+- A USB-UART bridge supporting **1 382 400 baud** (e.g. **Silicon Labs CP2104**,
+  CP2102N, FTDI FT232H). Cheaper/slower adapters may fail to set this baud rate.
 
-Sprzęt i okablowanie
---------------------
+Hardware and wiring
+-------------------
 
-Moduł zasilany **3.3 V**:
+3.3 V module:
 
 ==========  ==================
-Moduł       Mostek USB-UART
+Module      USB-UART bridge
 ==========  ==================
 ``TX``      ``RX``
 ``RX``      ``TX``
@@ -28,14 +27,14 @@ Moduł       Mostek USB-UART
 
 .. warning::
 
-   Baud **1 382 400** jest na tyle wysoki, że ``stty`` / sterownik CP2104 może
-   go nie ustawić poprawnie (odczyt na 460800 daje pozornie stabilne, lecz
-   **fałszywe** ramki — aliasing, ponieważ ``1382400 / 460800 = 3``).
-   Aplikacja ustawia baud przez **pyserial**, które robi to poprawnie
-   (termios), więc używaj jej, a nie ``cat``/``stty``.
+   The **1 382 400** baud rate is high enough that ``stty`` / the CP2104 driver
+   may fail to set it correctly (reading at 460800 yields seemingly stable but
+   **bogus** frames — aliasing, because ``1382400 / 460800 = 3``).
+   The application sets the baud rate via **pyserial**, which does it correctly
+   (termios), so use it rather than ``cat`` / ``stty``.
 
-Instalacja zależności
----------------------
+Installing dependencies
+-----------------------
 
 .. code-block:: bash
 
@@ -43,13 +42,13 @@ Instalacja zależności
    python3 -m venv .venv
    .venv/bin/pip install -r requirements.txt
 
-Zależności (``requirements.txt``): ``pyserial``, ``matplotlib``, ``numpy``.
+Dependencies (``requirements.txt``): ``pyserial``, ``matplotlib``, ``numpy``.
 
-Budowanie dokumentacji (opcjonalnie)
-------------------------------------
+Building the documentation (optional)
+-------------------------------------
 
 .. code-block:: bash
 
    .venv/bin/pip install -r docs/requirements.txt
    .venv/bin/sphinx-build -b html docs docs/_build/html
-   # wynik: docs/_build/html/index.html
+   # result: docs/_build/html/index.html

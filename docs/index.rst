@@ -1,35 +1,34 @@
 heartRate-adte2104-radar
 ========================
 
-Odczyt i wizualizacja na żywo z radaru 60 GHz **Andar ADTE2104 v2.0**
-(chip **ADT6101P**, protokołowo zgodny z **HLK-LD6002**) podłączonego przez UART.
-Aplikacja dekoduje firmowy protokół vital-signs i pokazuje **tętno (BPM)**,
-**oddech**, **dystans** oraz **obecność**, wraz z przebiegami fazy sercowej
-i oddechowej.
+Live readout and visualization from the 60 GHz **Andar ADTE2104 v2.0** radar
+(**ADT6101P** chip, protocol-compatible with **HLK-LD6002**) over UART.
+The application decodes the vendor vital-signs protocol and shows
+**heart rate (BPM)**, **breathing**, **distance** and **presence**, together
+with the heart and breathing phase waveforms.
 
 .. image:: _static/dashboard.png
-   :alt: Dashboard ADTE2104 — tętno, oddech, dystans, obecność
+   :alt: ADTE2104 dashboard — heart rate, breathing, distance, presence
    :width: 100%
 
 .. note::
 
-   Protokół tego modułu **nie** jest publicznie udokumentowany pod nazwą
-   ADTE2104 — został odtworzony (reverse-engineering) na żywo i potwierdzony
-   względem otwartych bibliotek dla zgodnego modułu HLK-LD6002.
-   Szczegóły: :doc:`protocol`.
+   This module's protocol is **not** publicly documented under the name
+   ADTE2104 — it was reverse-engineered live and confirmed against open-source
+   libraries for the compatible HLK-LD6002 module. Details: :doc:`protocol`.
 
-Najważniejsze cechy
--------------------
-
-- 🫀 **Tętno w BPM** w czasie rzeczywistym (typ ramki ``0x0A15``)
-- 🌬️ **Częstość oddechu** [/min] (``0x0A14``)
-- 📏 **Dystans do celu** [cm] + flaga obecności (``0x0A16``)
-- 📈 **Przebiegi fazy** sercowej i oddechowej (``0x0A13``)
-- 🟢 **Detekcja obecności** na podstawie wykrytych parametrów życiowych
-- 🖥️ Dashboard **matplotlib** + tryb zrzutu ekranu (``--shot``)
-
-Szybki start
+Key features
 ------------
+
+- 🫀 **Heart rate in BPM** in real time (frame type ``0x0A15``)
+- 🌬️ **Breathing rate** [/min] (``0x0A14``)
+- 📏 **Distance to target** [cm] + presence flag (``0x0A16``)
+- 📈 **Phase waveforms** for heart and breathing (``0x0A13``)
+- 🟢 **Presence detection** based on detected vital signs
+- 🖥️ **matplotlib** dashboard + screenshot mode (``--shot``)
+
+Quick start
+-----------
 
 .. code-block:: bash
 
@@ -39,8 +38,8 @@ Szybki start
    .venv/bin/pip install -r requirements.txt
    .venv/bin/python adte2104_dashboard.py
 
-Spis treści
------------
+Table of contents
+-----------------
 
 .. toctree::
    :maxdepth: 2

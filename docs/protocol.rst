@@ -1,95 +1,95 @@
-Protokół UART
+UART protocol
 =============
 
-Moduł **Andar ADTE2104 v2.0** to radar 60 GHz FMCW oparty na chipie
-**Andar ADT6101P**, protokołowo zgodny z modułem **HLK-LD6002** firmy
+The **Andar ADTE2104 v2.0** module is a 60 GHz FMCW radar based on the
+**Andar ADT6101P** chip, protocol-compatible with the **HLK-LD6002** module by
 `Shenzhen Hi-Link Electronic <https://www.hlktech.net/index.php?id=1180>`_.
-Poniższy opis odtworzono na żywo z urządzenia i potwierdzono względem
-otwartej biblioteki `icewind1991/hlk_ld6002
+The description below was reverse-engineered live from the device and confirmed
+against the open-source library `icewind1991/hlk_ld6002
 <https://github.com/icewind1991/hlk_ld6002>`_.
 
-Parametry portu
----------------
+Serial parameters
+-----------------
 
 ============  ==============================================================
-Parametr      Wartość
+Parameter     Value
 ============  ==============================================================
 Baud          **1 382 400**
-Format        8N1 (8 bitów danych, bez parzystości, 1 bit stopu)
-Kodowanie     liczby zmiennoprzecinkowe **float32 little-endian**
+Format        8N1 (8 data bits, no parity, 1 stop bit)
+Encoding      **float32 little-endian** values
 ============  ==============================================================
 
 .. warning::
 
-   ``stty`` / sterownik CP2104 może nie ustawić 1 382 400 baud. Odczyt na
-   460800 daje **fałszywe** 19-bajtowe ramki (aliasing ``1382400 / 460800 = 3``).
-   Otwieraj port przez :class:`serial.Serial` (pyserial), które ustawia baud
-   przez termios.
+   ``stty`` / the CP2104 driver may fail to set 1 382 400 baud. Reading at
+   460800 yields **bogus** 19-byte frames (aliasing ``1382400 / 460800 = 3``).
+   Open the port via :class:`serial.Serial` (pyserial), which sets the baud
+   rate through termios.
 
-Struktura ramki (TLV)
+Frame structure (TLV)
 ---------------------
 
 .. code-block:: text
 
-   +------+--------+--------+--------+------+------------+------+
-   | SOF  |  ID    |  LEN   |  TYPE  | HCK  |   DATA      | DCK  |
-   | 0x01 | 2 B BE | 2 B BE | 2 B BE | 1 B  |  LEN bajtów | 1 B  |
-   +------+--------+--------+--------+------+------------+------+
+   +------+--------+--------+--------+------+-------------+------+
+   | SOF  |  ID    |  LEN   |  TYPE  | HCK  |   DATA       | DCK  |
+   | 0x01 | 2 B BE | 2 B BE | 2 B BE | 1 B  |  LEN bytes   | 1 B  |
+   +------+--------+--------+--------+------+-------------+------+
 
-- **SOF** — bajt startu, zawsze ``0x01``
-- **ID** — identyfikator (uint16, big-endian)
-- **LEN** — długość pola ``DATA`` (uint16, big-endian)
-- **TYPE** — typ wiadomości (uint16, big-endian; tabela niżej)
-- **HCK** — suma kontrolna nagłówka: ``~XOR(bajty 0..6) & 0xFF``
-- **DATA** — ładunek o długości ``LEN``
-- **DCK** — suma kontrolna danych: ``~XOR(DATA) & 0xFF``
+- **SOF** — start-of-frame byte, always ``0x01``
+- **ID** — identifier (uint16, big-endian)
+- **LEN** — length of the ``DATA`` field (uint16, big-endian)
+- **TYPE** — message type (uint16, big-endian; see table below)
+- **HCK** — header checksum: ``~XOR(bytes 0..6) & 0xFF``
+- **DATA** — payload of length ``LEN``
+- **DCK** — data checksum: ``~XOR(DATA) & 0xFF``
 
-Typy wiadomości
----------------
+Message types
+-------------
 
 .. list-table::
    :header-rows: 1
    :widths: 12 18 10 60
 
    * - TYPE
-     - Znaczenie
+     - Meaning
      - LEN
-     - Dekodowanie ``DATA``
+     - ``DATA`` decoding
    * - ``0x0A13``
      - Phase
      - 12 B
-     - 3× float32 LE: faza całkowita / oddechowa / sercowa
+     - 3× float32 LE: total / breathing / heart phase
    * - ``0x0A14``
      - Respiratory
      - 4 B
-     - float32 LE — oddechy na minutę
+     - float32 LE — breaths per minute
    * - ``0x0A15``
      - **Heartbeat**
      - 4 B
-     - float32 LE — **tętno w BPM**
+     - float32 LE — **heart rate in BPM**
    * - ``0x0A16``
      - Distance
      - 8 B
-     - uint32 ``flaga`` + float32 LE ``dystans`` [cm]
+     - uint32 ``flag`` + float32 LE ``distance`` [cm]
    * - ``0x0A16``
      - Distance
      - 4 B
-     - brak celu (sam ``flaga`` ≠ 1)
+     - no target (``flag`` ≠ 1)
 
-Dla ramki **Distance** ``flaga == 1`` oznacza ważny pomiar (cel wykryty);
-inna wartość lub krótszy (4 B) wariant oznacza brak celu.
+For the **Distance** frame, ``flag == 1`` means a valid measurement (target
+detected); any other value or the shorter (4 B) variant means no target.
 
-Przykład dekodowania
---------------------
+Decoding example
+----------------
 
-Ramka tętna (``TYPE = 0x0A15``, ``LEN = 4``), ``DATA = 00 00 92 42``:
+Heart-rate frame (``TYPE = 0x0A15``, ``LEN = 4``), ``DATA = 00 00 92 42``:
 
 .. code-block:: python
 
    import struct
    struct.unpack("<f", bytes.fromhex("00009242"))[0]   # -> 73.0  (BPM)
 
-Weryfikacja sum kontrolnych:
+Checksum verification:
 
 .. code-block:: python
 
@@ -99,10 +99,10 @@ Weryfikacja sum kontrolnych:
            x ^= b
        return (~x) & 0xFF
 
-Detekcja obecności
+Presence detection
 ------------------
 
-Flaga w ramce ``Distance`` reaguje też na nieruchome odbicia (ściany, meble),
-dlatego aplikacja wyznacza **obecność człowieka** na podstawie wykrytych
-parametrów życiowych (tętno/oddech > 0) z podtrzymaniem ``PRESENCE_HOLD``
-sekund — patrz :meth:`adte2104_dashboard.Reader.is_present`.
+The flag in the ``Distance`` frame also reacts to static reflections (walls,
+furniture), so the application derives **human presence** from detected vital
+signs (heart/breath > 0) with a hold of ``PRESENCE_HOLD`` seconds — see
+:meth:`adte2104_dashboard.Reader.is_present`.

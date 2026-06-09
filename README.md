@@ -1,97 +1,104 @@
-# ADTE2104 v2.0 — radar tętna i obecności (60 GHz)
+# ADTE2104 v2.0 — heart-rate & presence radar (60 GHz)
 
-[![Dokumentacja](https://github.com/jakub-michalik/heartRate-adte2104-radar/actions/workflows/docs.yml/badge.svg)](https://github.com/jakub-michalik/heartRate-adte2104-radar/actions/workflows/docs.yml)
+[![Docs](https://github.com/jakub-michalik/heartRate-adte2104-radar/actions/workflows/docs.yml/badge.svg)](https://github.com/jakub-michalik/heartRate-adte2104-radar/actions/workflows/docs.yml)
 [![Docs online](https://img.shields.io/badge/docs-online-brightgreen)](https://jakub-michalik.github.io/heartRate-adte2104-radar/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Odczyt i wizualizacja na żywo z radaru **Andar ADTE2104 v2.0** (chip **ADT6101P**,
-protokołowo zgodny z **HLK-LD6002**) podłączonego przez UART (mostek CP2104).
+Live readout and visualization from the **Andar ADTE2104 v2.0** radar (**ADT6101P**
+chip, protocol-compatible with **HLK-LD6002**) over UART (CP2104 bridge).
 
-Dashboard pokazuje: **tętno [BPM]**, oddech [/min], dystans [cm], obecność oraz
-przebiegi fazy sercowej i oddechowej.
+The dashboard shows: **heart rate [BPM]**, breathing [/min], distance [cm], presence,
+and the heart/breathing phase waveforms.
 
-![Dashboard ADTE2104 — tętno, oddech, dystans, obecność](docs/_static/dashboard.png)
+![ADTE2104 dashboard — heart rate, breathing, distance, presence](docs/_static/dashboard.png)
 
-## Dokumentacja
+## Documentation
 
 📖 **Online:** https://jakub-michalik.github.io/heartRate-adte2104-radar/
-(budowana i publikowana automatycznie z `main` przez GitHub Actions →
+(built and published automatically from `main` by GitHub Actions →
 [`.github/workflows/docs.yml`](.github/workflows/docs.yml))
 
-Źródła w katalogu [`docs/`](docs/) — opis protokołu, instalacja, uruchomienie,
-API i materiały. Budowanie lokalnie:
+Sources live in [`docs/`](docs/) — protocol description, installation, usage,
+API and references. Build locally:
 
 ```bash
 .venv/bin/pip install -r docs/requirements.txt
 .venv/bin/sphinx-build -b html docs docs/_build/html
-# otwórz docs/_build/html/index.html
+# open docs/_build/html/index.html
 ```
 
-## Protokół (zweryfikowany na żywo)
+## Protocol (verified live)
 
-- **UART 1382400 baud, 8N1, bez parzystości.**
-  ⚠️ `stty` / CP2104 nie ustawia tak wysokiego baudu — trzeba przez **pyserial**
-  (`serial.Serial(port, 1382400)`), które ustawia go przez termios. Odczyt na
-  460800 daje pozornie stabilne, ale **fałszywe** ramki (aliasing, 1382400 ÷ 3).
-- Ramka TLV: `01 | ID(2 BE) | LEN(2 BE) | TYPE(2 BE) | HCK(1) | DATA[LEN] | DCK(1)`
-  - `HCK = ~XOR(bajty 0..6) & 0xFF`, `DCK = ~XOR(DATA) & 0xFF`
-  - wartości: **float32 little-endian**
+- **UART 1382400 baud, 8N1, no parity.**
+  ⚠️ `stty` / CP2104 cannot set such a high baud — you must use **pyserial**
+  (`serial.Serial(port, 1382400)`), which sets it via termios. Reading at
+  460800 yields seemingly stable but **bogus** frames (aliasing, 1382400 ÷ 3).
+- TLV frame: `01 | ID(2 BE) | LEN(2 BE) | TYPE(2 BE) | HCK(1) | DATA[LEN] | DCK(1)`
+  - `HCK = ~XOR(bytes 0..6) & 0xFF`, `DCK = ~XOR(DATA) & 0xFF`
+  - values: **float32 little-endian**
 
-| TYPE   | Znaczenie    | Payload                                  |
+| TYPE   | Meaning      | Payload                                  |
 |--------|--------------|------------------------------------------|
-| 0x0A13 | Phase        | 3× f32 (faza całkowita / oddechowa / serca) |
-| 0x0A14 | Respiratory  | f32 — oddechy/min                        |
+| 0x0A13 | Phase        | 3× f32 (total / breath / heart phase)    |
+| 0x0A14 | Respiratory  | f32 — breaths/min                        |
 | 0x0A15 | **Heartbeat**| f32 — **BPM**                            |
-| 0x0A16 | Distance     | u32 flaga + f32 [cm]; flaga==1 → obecność |
+| 0x0A16 | Distance     | u32 flag + f32 [cm]; flag==1 → present   |
 
-Firmware version **nie jest** wystawiana w strumieniu — appka identyfikuje moduł
-i loguje ewentualne nieznane ramki.
+Firmware version is **not** exposed in the stream — the app identifies the module
+and logs any unknown frames.
 
-## Instalacja
+## Installation
 
 ```bash
-cd ~/repos/adte2104-radar
+cd ~/repos/heartRate-adte2104-radar
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
 
-## Uruchomienie
+## Usage
 
 ```bash
-cd ~/repos/adte2104-radar
+cd ~/repos/heartRate-adte2104-radar
 .venv/bin/python adte2104_dashboard.py
 ```
 
-Domyślny port to `/dev/ttyUSB1`. Inny port podajesz argumentem:
+Default port is `/dev/ttyUSB1`. Use a different one as an argument:
 
 ```bash
 .venv/bin/python adte2104_dashboard.py /dev/ttyUSB0
 ```
 
-Pewniejszy (stały) port niezależny od kolejności podłączania USB:
+A stable, plug-order-independent port is recommended:
 
 ```bash
 .venv/bin/python adte2104_dashboard.py \
-  /dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_02E22F5D-if00-port0
+  /dev/serial/by-id/usb-Silicon_Labs_CP2104_USB_to_UART_Bridge_Controller_XXXX-if00-port0
 ```
 
-Zamknięcie okna lub `Ctrl-C` kończy program.
+Headless screenshot (no GUI window):
 
-## Wymagania
+```bash
+.venv/bin/python adte2104_dashboard.py --shot docs/_static/dashboard.png
+```
 
-- Linux, dostęp do portu szeregowego (bądź w grupie `dialout`, bez `sudo`).
-- Środowisko graficzne (matplotlib otwiera okno GUI).
+Close the window or press `Ctrl-C` to quit.
 
-## Podłączenie
+## Requirements
 
-Moduł 3.3 V: `TX → RX` mostka, `RX → TX`, `GND → GND`.
+- Linux, serial-port access (be in the `dialout` group, no `sudo`).
+- A graphical environment (matplotlib opens a GUI window) — except `--shot`.
+- USB-UART bridge supporting **1 382 400 baud** (e.g. Silicon Labs CP2104).
 
-## Źródła protokołu
+## Wiring
 
-- HLK-LD6002 (chip ADT6101P): <https://www.hlktech.net/index.php?id=1180>
+3.3 V module: `TX → RX` (bridge), `RX → TX`, `GND → GND`.
+
+## Protocol references
+
+- HLK-LD6002 (ADT6101P chip): <https://www.hlktech.net/index.php?id=1180>
 - icewind1991/hlk_ld6002 (Rust): <https://github.com/icewind1991/hlk_ld6002>
 - phuongnamzz/HLK-LD6002 (Arduino): <https://github.com/phuongnamzz/HLK-LD6002>
 
-## Licencja
+## License
 
 [MIT](LICENSE) © 2026 Jakub Michalik

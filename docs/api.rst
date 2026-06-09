@@ -1,8 +1,8 @@
-Dokumentacja API
-================
+API reference
+=============
 
-Moduł ``adte2104_dashboard``
-----------------------------
+``adte2104_dashboard`` module
+-----------------------------
 
 .. automodule:: adte2104_dashboard
    :members:

@@ -1,17 +1,17 @@
-name: Dokumentacja
+name: Docs
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
-# uprawnienia wymagane do publikacji na GitHub Pages
+# permissions required to publish to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# pozwól tylko jednemu wdrożeniu naraz
+# allow only one deployment at a time
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -26,17 +26,17 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Instalacja zależności dokumentacji
+      - name: Install documentation dependencies
         run: |
           python -m pip install --upgrade pip
-          # pyserial jest potrzebny, bo autodoc importuje moduł aplikacji
+          # pyserial is needed because autodoc imports the application module
           pip install pyserial
           pip install -r docs/requirements.txt
 
-      - name: Build Sphinx (traktuj warningi jako błędy)
+      - name: Build Sphinx (treat warnings as errors)
         run: sphinx-build -b html -W docs docs/_build/html
 
-      - name: Upload artefaktu Pages
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/_build/html
@@ -48,6 +48,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Wdrożenie na GitHub Pages
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
