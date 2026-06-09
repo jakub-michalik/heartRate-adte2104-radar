@@ -10,8 +10,12 @@ przebiegi fazy sercowej i oddechowej.
 
 ## Dokumentacja
 
-Pełna dokumentacja (Sphinx) w katalogu [`docs/`](docs/) — opis protokołu, instalacja,
-uruchomienie, API i źródła. Budowanie lokalnie:
+📖 **Online:** https://jakub-michalik.github.io/heartRate-adte2104-radar/
+(budowana i publikowana automatycznie z `main` przez GitHub Actions →
+[`.github/workflows/docs.yml`](.github/workflows/docs.yml))
+
+Źródła w katalogu [`docs/`](docs/) — opis protokołu, instalacja, uruchomienie,
+API i materiały. Budowanie lokalnie:
 
 ```bash
 .venv/bin/pip install -r docs/requirements.txt
