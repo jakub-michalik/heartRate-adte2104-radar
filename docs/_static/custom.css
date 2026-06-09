@@ -1,0 +1,30 @@
+/* Release dropdown in the sidebar */
+.sidebar-versions {
+  margin: 0.5rem 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sidebar-versions__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-foreground-muted);
+}
+
+.sidebar-versions__select {
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-foreground-primary);
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-background-border);
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.sidebar-versions__select:hover {
+  border-color: var(--color-brand-primary);
+}

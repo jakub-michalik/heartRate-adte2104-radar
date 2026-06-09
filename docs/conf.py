@@ -44,7 +44,22 @@ napoleon_google_docstring = True
 # -- HTML options -------------------------------------------------------------
 html_theme = "furo"
 html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 html_title = "ADTE2104 Radar — documentation"
+
+# add the release dropdown to the sidebar (after the brand)
+html_sidebars = {
+    "**": [
+        "sidebar/brand.html",
+        "sidebar/versions.html",
+        "sidebar/search.html",
+        "sidebar/scroll-start.html",
+        "sidebar/navigation.html",
+        "sidebar/ethical-ads.html",
+        "sidebar/scroll-end.html",
+        "sidebar/variant-selector.html",
+    ]
+}
 html_theme_options = {
     "source_repository": "https://github.com/jakub-michalik/heartRate-adte2104-radar",
     "source_branch": "main",

@@ -1,0 +1,21 @@
+{#- Release/version dropdown shown in the Furo sidebar.
+    Maintained manually; "latest" points at the published docs. -#}
+<div class="sidebar-versions">
+  <span class="sidebar-versions__label">Release</span>
+  <select class="sidebar-versions__select"
+          aria-label="Select release"
+          onchange="if (this.value) { window.location.href = this.value; }">
+    <option value="https://jakub-michalik.github.io/heartRate-adte2104-radar/" selected>
+      v1.0.1 (latest)
+    </option>
+    <option value="https://github.com/jakub-michalik/heartRate-adte2104-radar/releases/tag/v1.0.1">
+      v1.0.1 — release notes
+    </option>
+    <option value="https://github.com/jakub-michalik/heartRate-adte2104-radar/releases/tag/v1.0.0">
+      v1.0.0
+    </option>
+    <option value="https://github.com/jakub-michalik/heartRate-adte2104-radar/releases">
+      All releases →
+    </option>
+  </select>
+</div>
